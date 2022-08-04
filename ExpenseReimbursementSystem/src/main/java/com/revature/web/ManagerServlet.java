@@ -60,7 +60,8 @@ public class ManagerServlet extends HttpServlet{
 				response.setStatus(200);
 			}else {response.setStatus(400);
 			writer.write("Request Invalid");
-		break;}
+		break;
+		}
 		case"/managers/login":
 			response.setContentType("application/json");
 			String usernameTyped = request.getParameter("username");

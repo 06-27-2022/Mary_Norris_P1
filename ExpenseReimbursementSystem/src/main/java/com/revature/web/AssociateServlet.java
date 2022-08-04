@@ -15,6 +15,8 @@ import com.revature.ModelAssociate;
 import com.revature.repository.AssociateRepoImplement;
 import com.revature.repository.AssociateRepository;
 
+import ch.qos.logback.classic.Logger;
+
 
 
 
@@ -28,9 +30,10 @@ public class AssociateServlet extends HttpServlet{
 		String resource = request.getRequestURI();
 		
 		AssociateRepository mainAssociateRepository = new AssociateRepoImplement();
-		String necessaryAssociateResource = resource.replace("/ExpenseReimbursementSystem", "");
+		String necessaryAssociateResource = resource.replace("/ExpenseReimbursementSystem","");
 		ModelAssociate successfulLogin = null;
 		PrintWriter writer = response.getWriter();
+		ObjectMapper mapTime = new ObjectMapper();
 		
 		String httpVerb = request.getMethod();
 		
@@ -52,10 +55,16 @@ public class AssociateServlet extends HttpServlet{
 						response.setStatus(202);
 					}
 				}else if (httpVerb.equals("POST")) {
-					ModelAssociate additionalAssociate = new ModelAssociate();
 					if(currentUser == null) {
-						additionalAssociate = new ModelAssociate(0, "name", "username", "password");
-						mainAssociateRepository.save(additionalAssociate);
+						ModelAssociate rookie = new ModelAssociate();
+						String requestBodyText = new String();
+						mapTime.readValue(requestBodyText, ModelAssociate.class);
+						System.out.println(request.getQueryString());
+						String newName = request.getParameter("associate_name");
+						String newUsername = request.getParameter("associate_username");
+						String newPassword = request.getParameter("associate_password");
+						rookie = new ModelAssociate(0, newName, newUsername, newPassword);
+						mainAssociateRepository.save(rookie);
 						successfulLogin = mainAssociateRepository.locatebyUsername(usernameTyped);
 						Cookie newAssociateGetsCookie = new Cookie("authenticated","true");
 						response.addCookie(newAssociateGetsCookie);
@@ -64,23 +73,29 @@ public class AssociateServlet extends HttpServlet{
 					}else {response.setStatus(400);
 					writer.write("Username already exsists");
 					}
-					break;
 				}
-		case"associates/list":
+				break;
+		
+				
+				
+		case"/associates/list":
 			if(httpVerb.equals("GET")) {
 				response.setContentType("application/json");
 				AssociateRepository associateRepository = new AssociateRepoImplement();
 				List<ModelAssociate> associates = associateRepository.viewAssociateList();
-				ObjectMapper mapTime = new ObjectMapper();
+				mapTime = new ObjectMapper();
 				String json = mapTime.writeValueAsString(associates);
 				writer.write(json);
 				response.setStatus(200);
 			}else {response.setStatus(404);
 				writer.write("Request Not Possible");
-			}
+			}break;
+			
 		}
 			
-}	
+	}
+			
+	
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{

@@ -8,16 +8,23 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+
 import com.revature.util.ConnectionUtility;
 import com.revature.ModelAssociate;
+import com.revature.util.LogbackUtility;
 
 public class AssociateRepoImplement implements AssociateRepository{
+	
+	//ch.qos.logback.classic.Logger childLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("com.revature.util.LogbackUtility");
+
 
 		public List<ModelAssociate> viewAssociateList(){
 			
 			Connection newConn = null;
 			Statement newStmt = null;
 			ResultSet newSet = null;
+			
 			
 			List<ModelAssociate> associates = new ArrayList<>();
 			
@@ -50,8 +57,15 @@ public class AssociateRepoImplement implements AssociateRepository{
 					e.printStackTrace();
 				}
 			}
-			return associates;
+			 /*
+			try {
+				childLogger.debug("Debug of the viewAssociatesList method:", associates);
+			}catch(Exception e) {
+				childLogger.debug("Exception thrown on viewAssociateListmethod:", associates, e);
+			}
+			*/
 			
+			return associates;			
 		}
 	
 	@Override
@@ -82,6 +96,7 @@ public class AssociateRepoImplement implements AssociateRepository{
 			
 		}
 	}
+	
 	@Override
 	public void update(ModelAssociate associate) {
 		

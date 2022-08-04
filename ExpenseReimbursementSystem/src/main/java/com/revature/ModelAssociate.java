@@ -1,6 +1,5 @@
 package com.revature;
 
-
 public class ModelAssociate {
  
 		private int associate_id;
