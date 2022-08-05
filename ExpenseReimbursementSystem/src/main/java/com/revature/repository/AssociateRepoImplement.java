@@ -16,8 +16,6 @@ import com.revature.util.LogbackUtility;
 
 public class AssociateRepoImplement implements AssociateRepository{
 	
-	//ch.qos.logback.classic.Logger childLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("com.revature.util.LogbackUtility");
-
 
 		public List<ModelAssociate> viewAssociateList(){
 			
@@ -57,13 +55,7 @@ public class AssociateRepoImplement implements AssociateRepository{
 					e.printStackTrace();
 				}
 			}
-			 /*
-			try {
-				childLogger.debug("Debug of the viewAssociatesList method:", associates);
-			}catch(Exception e) {
-				childLogger.debug("Exception thrown on viewAssociateListmethod:", associates, e);
-			}
-			*/
+			
 			
 			return associates;			
 		}

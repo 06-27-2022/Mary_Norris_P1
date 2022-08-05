@@ -14,6 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ModelAssociate;
 import com.revature.repository.AssociateRepoImplement;
 import com.revature.repository.AssociateRepository;
+import com.revature.ModelReimbursement;
+import com.revature.repository.ReimbursementRepository;
+import com.revature.repository.ReimbursementRepoImplement;
+
 
 import ch.qos.logback.classic.Logger;
 
@@ -30,6 +34,7 @@ public class AssociateServlet extends HttpServlet{
 		String resource = request.getRequestURI();
 		
 		AssociateRepository mainAssociateRepository = new AssociateRepoImplement();
+		ReimbursementRepository mainReimbursementRepository = new ReimbursementRepoImplement();
 		String necessaryAssociateResource = resource.replace("/ExpenseReimbursementSystem","");
 		ModelAssociate successfulLogin = null;
 		PrintWriter writer = response.getWriter();
@@ -45,7 +50,7 @@ public class AssociateServlet extends HttpServlet{
 			ModelAssociate currentUser = mainAssociateRepository.locatebyUsername(usernameTyped);
 				if(httpVerb.equals("GET")) {
 					if(currentUser == null) {
-						writer.write("Incorrect Username/No Current Account");
+						writer.write("Incorrect Username or No Current Account");
 						response.setStatus(401);
 					}else {
 						successfulLogin = mainAssociateRepository.locatebyUsername(usernameTyped);
@@ -55,26 +60,28 @@ public class AssociateServlet extends HttpServlet{
 						response.setStatus(202);
 					}
 				}else if (httpVerb.equals("POST")) {
-					if(currentUser == null) {
 						ModelAssociate rookie = new ModelAssociate();
-						String requestBodyText = new String();
-						mapTime.readValue(requestBodyText, ModelAssociate.class);
-						System.out.println(request.getQueryString());
-						String newName = request.getParameter("associate_name");
-						String newUsername = request.getParameter("associate_username");
-						String newPassword = request.getParameter("associate_password");
-						rookie = new ModelAssociate(0, newName, newUsername, newPassword);
-						mainAssociateRepository.save(rookie);
-						successfulLogin = mainAssociateRepository.locatebyUsername(usernameTyped);
-						Cookie newAssociateGetsCookie = new Cookie("authenticated","true");
-						response.addCookie(newAssociateGetsCookie);
-						writer.write("Welcome New Revature Associate");
-						response.setStatus(201);						
-					}else {response.setStatus(400);
-					writer.write("Username already exsists");
-					}
+						System.out.println(request.getQueryString());				
+						String rookieName = request.getParameter("associate_name");
+						String rookieUsername = request.getParameter("associate_username");
+						String rookiePassword = request.getParameter("associate_password");
+						ModelAssociate usernameTaken = mainAssociateRepository.locatebyUsername(rookieUsername);
+							
+						if (usernameTaken != null) {
+							writer.write("Username already exsists. Try again");
+							response.setStatus(400);
+						} else {
+							rookie = new ModelAssociate(0, rookieName, rookieUsername, rookiePassword);
+							mainAssociateRepository.save(rookie);
+							Cookie newAssociateGetsCookie = new Cookie("authenticated","true");
+							response.addCookie(newAssociateGetsCookie);
+							response.setContentType("application/json");
+							writer.write("Welcome New Revature Associate");
+							response.setStatus(201);						
+			
 				}
 				break;
+				}
 		
 				
 				
@@ -90,6 +97,26 @@ public class AssociateServlet extends HttpServlet{
 			}else {response.setStatus(404);
 				writer.write("Request Not Possible");
 			}break;
+			
+		case"/associates/ticket-submission":
+			if(httpVerb.equals("POST")) {
+				ModelReimbursement newSubmission = new ModelReimbursement();
+				System.out.println(request.getQueryString());				
+				String associateName = request.getParameter("associate_name");
+				String associateUsername = request.getParameter("associate_username");
+				String amount = request.getParameter("amount");
+					double amountParsed = Double.parseDouble(amount);
+				String description = request.getParameter("description");
+				
+				newSubmission = new ModelReimbursement(0, associateName, associateUsername, 1, amountParsed, description, "pending");
+				mainReimbursementRepository.save(newSubmission);
+				Cookie newTicketCookie = new Cookie("authenticated","true");
+				response.addCookie(newTicketCookie);
+				response.setContentType("application/json");
+				writer.write("Ticket processed. If ticket request is still pending after 3 buisness days, please contact your manager.");
+				response.setStatus(201);
+				
+			}
 			
 		}
 			
