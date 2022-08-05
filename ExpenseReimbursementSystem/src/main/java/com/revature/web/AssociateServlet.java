@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.ModelAssociate;
+import com.revature.ModelManager;
 import com.revature.repository.AssociateRepoImplement;
 import com.revature.repository.AssociateRepository;
 import com.revature.ModelReimbursement;
@@ -77,11 +78,9 @@ public class AssociateServlet extends HttpServlet{
 						response.addCookie(newAssociateGetsCookie);
 						response.setContentType("application/json");
 						writer.write("Welcome New Revature Associate");
-						response.setStatus(201);						
-			
-					}
-					break;
-					}
+						response.setStatus(201);					
+						}
+					}break;
 				
 				
 		case"/associates/list":
@@ -122,7 +121,30 @@ public class AssociateServlet extends HttpServlet{
 						response.setStatus(201);
 					}
 				
-			}
+				}break;
+			
+		case"/associates/check-ticket":
+			String ticketAccessUsername = request.getParameter("username");
+			String ticketAccessPassword = request.getParameter("password");
+			if (httpVerb.equals("POST")) {
+				ModelReimbursement myTickets = mainReimbursementRepository.locateReimbursementUsername(ticketAccessUsername);
+				String json = mapTime.writeValueAsString(myTickets);
+				response.setContentType("application/json");
+				writer.write("To filter by status, insert a status into the designated box.");
+				writer.write(json);
+				response.setStatus(200);
+				String statusInput = request.getParameter("status");
+					if(statusInput.equals("pending")) {
+						mainReimbursementRepository.filterByStatus(statusInput);
+					}else if(statusInput.equals("approved")) {
+						mainReimbursementRepository.filterByStatus(statusInput);
+					}else if(statusInput.equals("denied")) {
+						mainReimbursementRepository.filterByStatus(statusInput);
+					}else {response.setStatus(404);
+					}
+			}break;
+			
+			
 			
 		}
 			

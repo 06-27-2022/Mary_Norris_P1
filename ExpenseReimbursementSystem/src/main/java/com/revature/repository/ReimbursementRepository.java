@@ -12,4 +12,8 @@ public interface ReimbursementRepository {
 	void update(String approvedORdenied, int reimbursementID);
 		
 	ModelReimbursement locateReimbursementId(int reimbursementId);
+	
+	ModelReimbursement locateReimbursementUsername(String usernameOnTicket);
+	
+	ModelReimbursement filterByStatus(String currentStatus);
 }

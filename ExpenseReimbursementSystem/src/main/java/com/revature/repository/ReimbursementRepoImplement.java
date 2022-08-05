@@ -160,6 +160,91 @@ public class ReimbursementRepoImplement implements ReimbursementRepository {
 		return reimbursement;
 	}
 	
+	@Override
+	public ModelReimbursement locateReimbursementUsername(String usernameOnTicket) {
+	
+		ModelReimbursement reimbursement = null;
+		
+		Connection newConn = null;
+		PreparedStatement newStmt = null;
+		ResultSet newSet = null;
+		
+		final String SQL = "Select * from reimbursementtickets where associate_username = ?";
+		
+		try {
+			newConn = ConnectionUtility.getNewDBConnection();
+			newStmt = newConn.prepareStatement(SQL);
+			newStmt.setString(1, usernameOnTicket);
+			newSet = newStmt.executeQuery();
+			
+			if(newSet.next()) {
+				reimbursement = new ModelReimbursement(
+						newSet.getInt(1),
+						newSet.getString(2),
+						newSet.getString(3),
+						newSet.getInt(4),
+						newSet.getDouble(5),
+						newSet.getString(6),
+						newSet.getString(7));
+						
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				newConn.close();
+				newStmt.close();
+				newSet.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return reimbursement;
+	}
+	
+	@Override
+	public ModelReimbursement filterByStatus(String currentStatus) {
+	
+		ModelReimbursement reimbursement = null;
+		
+		Connection newConn = null;
+		PreparedStatement newStmt = null;
+		ResultSet newSet = null;
+		
+		final String SQL = "Select * from reimbursementtickets where approved_or_denied = ?";
+		
+		try {
+			newConn = ConnectionUtility.getNewDBConnection();
+			newStmt = newConn.prepareStatement(SQL);
+			newStmt.setString(1, currentStatus);
+			newSet = newStmt.executeQuery();
+			
+			if(newSet.next()) {
+				reimbursement = new ModelReimbursement(
+						newSet.getInt(1),
+						newSet.getString(2),
+						newSet.getString(3),
+						newSet.getInt(4),
+						newSet.getDouble(5),
+						newSet.getString(6),
+						newSet.getString(7));
+						
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				newConn.close();
+				newStmt.close();
+				newSet.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return reimbursement;
+	}
 
 
 }
