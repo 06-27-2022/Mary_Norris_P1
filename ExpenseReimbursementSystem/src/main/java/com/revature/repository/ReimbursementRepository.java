@@ -8,8 +8,8 @@ public interface ReimbursementRepository {
 	List<ModelReimbursement> viewReimbursementList();
 	
 	void save(ModelReimbursement additionalReimbursement);
-		
-	void update(ModelReimbursement reimbursement);
+	
+	void update(String approvedORdenied, int reimbursementID);
 		
 	ModelReimbursement locateReimbursementId(int reimbursementId);
 }

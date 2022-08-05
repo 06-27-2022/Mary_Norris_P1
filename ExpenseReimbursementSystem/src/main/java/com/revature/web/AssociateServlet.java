@@ -67,22 +67,21 @@ public class AssociateServlet extends HttpServlet{
 						String rookiePassword = request.getParameter("associate_password");
 						ModelAssociate usernameTaken = mainAssociateRepository.locatebyUsername(rookieUsername);
 							
-						if (usernameTaken != null) {
-							writer.write("Username already exsists. Try again");
-							response.setStatus(400);
-						} else {
-							rookie = new ModelAssociate(0, rookieName, rookieUsername, rookiePassword);
-							mainAssociateRepository.save(rookie);
-							Cookie newAssociateGetsCookie = new Cookie("authenticated","true");
-							response.addCookie(newAssociateGetsCookie);
-							response.setContentType("application/json");
-							writer.write("Welcome New Revature Associate");
-							response.setStatus(201);						
+					if (usernameTaken != null) {
+						writer.write("Username already exsists. Try again");
+						response.setStatus(400);
+					} else {
+						rookie = new ModelAssociate(0, rookieName, rookieUsername, rookiePassword);
+						mainAssociateRepository.save(rookie);
+						Cookie newAssociateGetsCookie = new Cookie("authenticated","true");
+						response.addCookie(newAssociateGetsCookie);
+						response.setContentType("application/json");
+						writer.write("Welcome New Revature Associate");
+						response.setStatus(201);						
 			
-				}
-				break;
-				}
-		
+					}
+					break;
+					}
 				
 				
 		case"/associates/list":
@@ -98,23 +97,30 @@ public class AssociateServlet extends HttpServlet{
 				writer.write("Request Not Possible");
 			}break;
 			
+			
 		case"/associates/ticket-submission":
 			if(httpVerb.equals("POST")) {
 				ModelReimbursement newSubmission = new ModelReimbursement();
 				System.out.println(request.getQueryString());				
 				String associateName = request.getParameter("associate_name");
 				String associateUsername = request.getParameter("associate_username");
-				String amount = request.getParameter("amount");
-					double amountParsed = Double.parseDouble(amount);
-				String description = request.getParameter("description");
-				
-				newSubmission = new ModelReimbursement(0, associateName, associateUsername, 1, amountParsed, description, "pending");
-				mainReimbursementRepository.save(newSubmission);
-				Cookie newTicketCookie = new Cookie("authenticated","true");
-				response.addCookie(newTicketCookie);
-				response.setContentType("application/json");
-				writer.write("Ticket processed. If ticket request is still pending after 3 buisness days, please contact your manager.");
-				response.setStatus(201);
+				ModelAssociate validUsername = mainAssociateRepository.locatebyUsername(associateUsername);
+					if (validUsername ==null) {
+						writer.write("Invalid Username");
+						response.setStatus(400);	
+					}else {
+						String amount = request.getParameter("amount");
+						double amountParsed = Double.parseDouble(amount);
+						
+						String description = request.getParameter("description");				
+						newSubmission = new ModelReimbursement(0, associateName, associateUsername, 1, amountParsed, description, "pending");
+						mainReimbursementRepository.save(newSubmission);
+						Cookie newTicketCookie = new Cookie("authenticated","true");
+						response.addCookie(newTicketCookie);
+						response.setContentType("application/json");
+						writer.write("Ticket processed. If ticket request is still pending after 3 buisness days, please contact your manager.");
+						response.setStatus(201);
+					}
 				
 			}
 			
@@ -130,3 +136,6 @@ public class AssociateServlet extends HttpServlet{
 	}
 
 }
+
+//create a method in AssociateRepo to authenticate Associate credentials/ to clean up code
+

@@ -21,7 +21,7 @@ public class ReimbursementRepoImplement implements ReimbursementRepository {
 		
 		List<ModelReimbursement> reimbursements = new ArrayList<>();
 		
-		final String SQL = "select * from reimbursements";
+		final String SQL = "select * from reimbursementtickets";
 		
 		try {
 			newConn = ConnectionUtility.getNewDBConnection();
@@ -64,17 +64,16 @@ public class ReimbursementRepoImplement implements ReimbursementRepository {
 		Connection newConn = null;
 		PreparedStatement newStmt = null;
 		
-		final String SQL = "insert into reimbursements values(default, ?, ?, ?, ?, ?, ?) ";
+		final String SQL = "insert into reimbursementtickets values(default, ?, ?, 1, ?, ?, ?) ";
 		try {
 			newConn = ConnectionUtility.getNewDBConnection();
 			newStmt = newConn.prepareStatement(SQL);
 			
-			newStmt.setString(2, additionalReimbursement.getAssociateName());
-			newStmt.setString(3, additionalReimbursement.getAssociateUsername());
-			newStmt.setInt(4, additionalReimbursement.getManagerId());
-			newStmt.setDouble(5, additionalReimbursement.getReimbursementAmount());
-			newStmt.setString(6, additionalReimbursement.getReimbursementDescription());
-			newStmt.setString(7, additionalReimbursement.getApprovedORdenied());
+			newStmt.setString(1, additionalReimbursement.getAssociateName());
+			newStmt.setString(2, additionalReimbursement.getAssociateUsername());
+			newStmt.setDouble(3, additionalReimbursement.getReimbursementAmount());
+			newStmt.setString(4, additionalReimbursement.getReimbursementDescription());
+			newStmt.setString(5,  additionalReimbursement.getApprovedORdenied());
 			newStmt.execute();
 			
 		}catch(SQLException e) {
@@ -90,20 +89,21 @@ public class ReimbursementRepoImplement implements ReimbursementRepository {
 		}
 	}
 	
+	
 	@Override
-	public void update(ModelReimbursement reimbursement) {
+	public void update(String approvedORdenied, int reimbursementID) {
 		
 		Connection newConn = null;
 		PreparedStatement newStmt = null;
 		
-		final String SQL = "update reimbursements set approved_or_denied = ? where associate_username = ?";
+		final String SQL = "update reimbursementtickets set approved_or_denied = ? where reimbursement_id = ?";
 		
 		try {
 			newConn = ConnectionUtility.getNewDBConnection();
 			newStmt = newConn.prepareStatement(SQL);
 			
-			newStmt.setString(7, reimbursement.getApprovedORdenied());
-			newStmt.setString(3, reimbursement.getAssociateUsername());
+			newStmt.setString(1, approvedORdenied);
+			newStmt.setInt(2, reimbursementID);
 			newStmt.execute();
 			}catch(SQLException e) {
 				e.printStackTrace();
@@ -116,6 +116,7 @@ public class ReimbursementRepoImplement implements ReimbursementRepository {
 				}
 			}
 	}
+	
 	@Override
 	public ModelReimbursement locateReimbursementId(int reimbursementId) {
 		
@@ -125,7 +126,7 @@ public class ReimbursementRepoImplement implements ReimbursementRepository {
 		PreparedStatement newStmt = null;
 		ResultSet newSet = null;
 		
-		final String SQL = "Select * from reimbursements where reimbursement_id = ?";
+		final String SQL = "Select * from reimbursementtickets where reimbursement_id = ?";
 		
 		try {
 			newConn = ConnectionUtility.getNewDBConnection();

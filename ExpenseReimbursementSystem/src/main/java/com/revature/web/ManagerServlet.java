@@ -34,8 +34,7 @@ public class ManagerServlet extends HttpServlet{
 		ReimbursementRepository mainTicketRepository = new ReimbursementRepoImplement();
 		String necessaryTicketResource = resource.replace("/ExpenseReimbursementSystem", "");
 		ModelManager successfulLogin = null;
-		ObjectMapper mapTime = new ObjectMapper();
-		
+		ObjectMapper mapTime = new ObjectMapper();		
 		
 		switch(necessaryTicketResource) {
 		
@@ -77,7 +76,6 @@ public class ManagerServlet extends HttpServlet{
 			String ticketAccessPassword = request.getParameter("password");
 			ModelManager accesstoReimbursements = mainManagerRepository.locatebyManagerUsername(ticketAccessUsername);
 			ModelManager accesstoReimbursementsPassword = mainManagerRepository.locatebyManagerPassword(ticketAccessPassword);
-			ModelReimbursement findTicket = null;
 				if(accesstoReimbursements !=null && accesstoReimbursementsPassword != null) {
 					Cookie managerTicketCookie = new Cookie("manager", "true");
 					response.addCookie(managerTicketCookie);
@@ -89,31 +87,32 @@ public class ManagerServlet extends HttpServlet{
 						writer.write(json);
 						response.setStatus(200);
 					}else if (httpVerb.equals("POST")) {
-						int ID = Integer.parseInt(request.getParameter("reimbursement_id"));
+						int ID = Integer.parseInt(request.getParameter("reimbursementID"));
 						ModelReimbursement ticketCollection = mainTicketRepository.locateReimbursementId(ID);
-						String approved = new String ();
-						String denied = new String ();
-						ticketCollection.setApprovedORdenied(approved);
+						String json = mapTime.writeValueAsString(ticketCollection);
+						response.setContentType("application/json");
 						writer.write("Please enter 'approved' or 'denied'");
-					}
+						writer.write(json);
+						String approvedORdenied = request.getParameter("status");
+							if (approvedORdenied.equals("approved")){
+								final String approved = "approved";
+								mainTicketRepository.update(approved, ID);
+							}else if (approvedORdenied.equals("denied")) {
+								final String denied = "denied";
+								mainTicketRepository.update(denied, ID);
+							}
+							
+					}break;
+					
+				}else {response.setStatus(404);
+					writer.write("Request not available.");
+				}
 						
-				}break;
-				
-				
-		case "/managers/ticketlist":
-		if(httpVerb.equals("GET")) {
-			response.setContentType("application/json");
-			List<ModelReimbursement> reimbursements = mainTicketRepository.viewReimbursementList();
-			String json = mapTime.writeValueAsString(reimbursements);
-			writer.write(json);
-			response.setStatus(200);
-		}else {response.setStatus(404);
-			writer.write("Request Not Possible");
 		}
 	}
-		
-		
-}
+				
+
+
 			
 
 			
@@ -123,3 +122,5 @@ public class ManagerServlet extends HttpServlet{
 	}
 }
 
+
+//create a method in ManagerRepo to authenticate Manager credentials/ to clean up code
